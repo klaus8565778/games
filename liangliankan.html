@@ -1,0 +1,743 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=no">
+<link rel="icon" href="data:,">
+<title>连连看</title>
+<style>
+  *, *::before, *::after { box-sizing: border-box; }
+
+  :root {
+    --bg: #f6f1e8;
+    --ink: #263238;
+    --muted: #68757f;
+    --panel: #ffffff;
+    --line: rgba(38, 50, 56, 0.14);
+    --tile: #fffaf0;
+    --tile-hover: #fff1cb;
+    --accent: #2f8f83;
+    --accent-dark: #1f675e;
+    --warn: #d94d35;
+    --gold: #f0b84e;
+    --tile-size: clamp(38px, 10.4vw, 68px);
+    --gap: 7px;
+  }
+
+  html, body { min-height: 100%; }
+
+  body {
+    margin: 0;
+    background:
+      radial-gradient(circle at 15% 15%, rgba(240, 184, 78, 0.18), transparent 30%),
+      linear-gradient(135deg, #f6f1e8 0%, #e7f4ef 100%);
+    color: var(--ink);
+    font-family: "Microsoft YaHei", "PingFang SC", "Segoe UI", system-ui, sans-serif;
+    user-select: none;
+    -webkit-user-select: none;
+  }
+
+  button {
+    font: inherit;
+  }
+
+  .game-shell {
+    display: grid;
+    min-height: 100vh;
+    place-items: center;
+    padding: 24px 14px;
+  }
+
+  .game {
+    width: min(760px, 100%);
+  }
+
+  .topbar {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 14px;
+    margin-bottom: 14px;
+  }
+
+  .title-block {
+    display: grid;
+    gap: 2px;
+  }
+
+  .title {
+    margin: 0;
+    color: #245a56;
+    font-size: clamp(24px, 6vw, 38px);
+    letter-spacing: 0;
+    line-height: 1.08;
+  }
+
+  .subtitle {
+    color: var(--muted);
+    font-size: 13px;
+  }
+
+  .reset {
+    min-width: 92px;
+    min-height: 42px;
+    border: 0;
+    border-radius: 8px;
+    background: var(--accent);
+    color: #fff;
+    font-weight: 800;
+    cursor: pointer;
+    box-shadow: 0 12px 24px rgba(47, 143, 131, 0.2);
+    transition: transform 140ms ease, background 140ms ease;
+  }
+
+  .reset:hover { background: var(--accent-dark); transform: translateY(-1px); }
+  .reset:active { transform: translateY(0); }
+
+  .stats {
+    display: grid;
+    grid-template-columns: repeat(3, 1fr);
+    gap: 8px;
+    margin-bottom: 14px;
+  }
+
+  .stat {
+    min-width: 0;
+    padding: 12px 10px;
+    border: 1px solid rgba(255, 255, 255, 0.72);
+    border-radius: 8px;
+    background: rgba(255, 255, 255, 0.62);
+    box-shadow: 0 14px 34px rgba(38, 50, 56, 0.08);
+  }
+
+  .stat-label {
+    display: block;
+    color: var(--muted);
+    font-size: 12px;
+    line-height: 1.2;
+  }
+
+  .stat-value {
+    display: block;
+    margin-top: 4px;
+    color: var(--ink);
+    font-size: 21px;
+    font-weight: 850;
+    line-height: 1;
+  }
+
+  .stat-value.danger {
+    color: var(--warn);
+  }
+
+  .board-wrap {
+    position: relative;
+    display: grid;
+    justify-content: center;
+    padding: 12px;
+    border: 1px solid rgba(255, 255, 255, 0.76);
+    border-radius: 8px;
+    background: rgba(255, 255, 255, 0.62);
+    box-shadow: 0 24px 56px rgba(38, 50, 56, 0.14);
+    overflow: hidden;
+  }
+
+  .board {
+    position: relative;
+    display: grid;
+    grid-template-columns: repeat(8, var(--tile-size));
+    grid-template-rows: repeat(6, var(--tile-size));
+    gap: var(--gap);
+    touch-action: manipulation;
+  }
+
+  .tile {
+    width: var(--tile-size);
+    height: var(--tile-size);
+    border: 1px solid rgba(38, 50, 56, 0.12);
+    border-radius: 8px;
+    background:
+      linear-gradient(180deg, rgba(255, 255, 255, 0.9), rgba(255, 250, 240, 0.95)),
+      var(--tile);
+    color: #263238;
+    cursor: pointer;
+    display: grid;
+    place-items: center;
+    font-size: calc(var(--tile-size) * 0.48);
+    line-height: 1;
+    box-shadow: inset 0 -3px 0 rgba(38, 50, 56, 0.06), 0 8px 16px rgba(38, 50, 56, 0.08);
+    transition: transform 130ms ease, background 130ms ease, box-shadow 130ms ease, opacity 160ms ease;
+  }
+
+  .tile:hover {
+    background: var(--tile-hover);
+    transform: translateY(-1px);
+  }
+
+  .tile.selected {
+    border-color: rgba(47, 143, 131, 0.72);
+    background: #dff5ee;
+    box-shadow: inset 0 0 0 3px rgba(47, 143, 131, 0.2), 0 10px 18px rgba(47, 143, 131, 0.16);
+    transform: translateY(-2px);
+  }
+
+  .tile.matched {
+    pointer-events: none;
+    opacity: 0;
+    transform: scale(0.7);
+  }
+
+  .tile.shake {
+    animation: shake 260ms ease;
+  }
+
+  .path-layer {
+    position: absolute;
+    inset: 0;
+    pointer-events: none;
+    overflow: visible;
+  }
+
+  .path-line {
+    fill: none;
+    stroke: var(--gold);
+    stroke-linecap: round;
+    stroke-linejoin: round;
+    stroke-width: 5;
+    filter: drop-shadow(0 2px 4px rgba(160, 110, 20, 0.24));
+    animation: trace 260ms ease forwards;
+  }
+
+  .overlay {
+    position: absolute;
+    inset: 0;
+    display: grid;
+    place-items: center;
+    padding: 20px;
+    background: rgba(246, 241, 232, 0.82);
+    backdrop-filter: blur(7px);
+  }
+
+  .overlay.hidden {
+    display: none;
+  }
+
+  .dialog {
+    width: min(360px, 100%);
+    padding: 24px;
+    border: 1px solid rgba(255, 255, 255, 0.8);
+    border-radius: 8px;
+    background: #fffef9;
+    box-shadow: 0 24px 54px rgba(38, 50, 56, 0.18);
+    text-align: center;
+  }
+
+  .dialog h2 {
+    margin: 0 0 8px;
+    color: #245a56;
+    font-size: 28px;
+    line-height: 1.1;
+  }
+
+  .dialog p {
+    margin: 0 0 18px;
+    color: var(--muted);
+  }
+
+  .dialog button {
+    min-width: 112px;
+    min-height: 42px;
+    border: 0;
+    border-radius: 8px;
+    background: var(--accent);
+    color: #fff;
+    font-weight: 800;
+    cursor: pointer;
+  }
+
+  .hint {
+    margin: 12px 0 0;
+    color: #748088;
+    font-size: 12px;
+    text-align: center;
+  }
+
+  @keyframes shake {
+    0%, 100% { transform: translateX(0); }
+    25% { transform: translateX(-5px); }
+    50% { transform: translateX(5px); }
+    75% { transform: translateX(-3px); }
+  }
+
+  @keyframes trace {
+    from { opacity: 0; stroke-dasharray: 16 10; }
+    25% { opacity: 1; }
+    to { opacity: 0; stroke-dasharray: 16 10; }
+  }
+
+  @media (max-width: 520px) {
+    :root {
+      --gap: 5px;
+      --tile-size: clamp(34px, 10.7vw, 46px);
+    }
+
+    .game-shell {
+      align-items: start;
+      padding-top: 16px;
+    }
+
+    .topbar {
+      align-items: end;
+    }
+
+    .subtitle {
+      font-size: 12px;
+    }
+
+    .reset {
+      min-width: 76px;
+      min-height: 38px;
+      font-size: 14px;
+    }
+
+    .stats {
+      gap: 6px;
+    }
+
+    .stat {
+      padding: 10px 8px;
+    }
+
+    .stat-value {
+      font-size: 19px;
+    }
+
+    .board-wrap {
+      padding: 8px;
+    }
+
+  }
+</style>
+</head>
+<body>
+<main class="game-shell">
+  <section class="game" aria-label="连连看游戏">
+    <div class="topbar">
+      <div class="title-block">
+        <h1 class="title">连连看</h1>
+        <div class="subtitle">经典水果 · 最多两次转弯</div>
+      </div>
+      <button class="reset" id="resetBtn" type="button">重新开始</button>
+    </div>
+
+    <div class="stats" aria-live="polite">
+      <div class="stat">
+        <span class="stat-label">关卡</span>
+        <span class="stat-value" id="levelEl">1</span>
+      </div>
+      <div class="stat">
+        <span class="stat-label">剩余时间</span>
+        <span class="stat-value" id="timeEl">03:00</span>
+      </div>
+      <div class="stat">
+        <span class="stat-label">已消除</span>
+        <span class="stat-value" id="matchedEl">0/48</span>
+      </div>
+    </div>
+
+    <div class="board-wrap" id="boardWrap">
+      <div class="board" id="board"></div>
+      <svg class="path-layer" id="pathLayer" aria-hidden="true"></svg>
+      <div class="overlay hidden" id="overlay">
+        <div class="dialog">
+          <h2 id="overlayTitle">游戏结束</h2>
+          <p id="overlayText">时间用完了，再试一次。</p>
+          <button id="overlayBtn" type="button">重新开始</button>
+        </div>
+      </div>
+    </div>
+
+    <p class="hint">点选两个相同水果，路径中间不能被其他水果挡住。</p>
+  </section>
+</main>
+
+<script>
+  const ROWS = 6;
+  const COLS = 8;
+  const TOTAL_TILES = ROWS * COLS;
+  const BASE_TIME = 180;
+  const TIME_STEP = 20;
+  const MIN_TIME = 60;
+  const FRUITS = ["🍎", "🍊", "🍋", "🍌", "🍉", "🍇", "🍓", "🍒", "🍑", "🍍", "🥝", "🥭", "🍐", "🍈", "🫐", "🥥"];
+
+  const boardEl = document.getElementById("board");
+  const boardWrapEl = document.getElementById("boardWrap");
+  const pathLayerEl = document.getElementById("pathLayer");
+  const levelEl = document.getElementById("levelEl");
+  const timeEl = document.getElementById("timeEl");
+  const matchedEl = document.getElementById("matchedEl");
+  const resetBtn = document.getElementById("resetBtn");
+  const overlayEl = document.getElementById("overlay");
+  const overlayTitleEl = document.getElementById("overlayTitle");
+  const overlayTextEl = document.getElementById("overlayText");
+  const overlayBtn = document.getElementById("overlayBtn");
+
+  let grid = [];
+  let selected = null;
+  let level = 1;
+  let timeLeft = BASE_TIME;
+  let matchedCount = 0;
+  let timerId = null;
+  let locked = false;
+  let nextLevelId = null;
+
+  function createEmptyGrid() {
+    return Array.from({ length: ROWS + 2 }, () => Array(COLS + 2).fill(0));
+  }
+
+  function shuffle(items) {
+    for (let i = items.length - 1; i > 0; i--) {
+      const j = Math.floor(Math.random() * (i + 1));
+      [items[i], items[j]] = [items[j], items[i]];
+    }
+    return items;
+  }
+
+  function createBoard() {
+    const pairCount = TOTAL_TILES / 2;
+    const tiles = [];
+    for (let i = 0; i < pairCount; i++) {
+      const fruit = FRUITS[i % FRUITS.length];
+      tiles.push(fruit, fruit);
+    }
+    shuffle(tiles);
+
+    grid = createEmptyGrid();
+    let index = 0;
+    for (let row = 1; row <= ROWS; row++) {
+      for (let col = 1; col <= COLS; col++) {
+        grid[row][col] = tiles[index++];
+      }
+    }
+  }
+
+  function levelTime(currentLevel) {
+    return Math.max(MIN_TIME, BASE_TIME - (currentLevel - 1) * TIME_STEP);
+  }
+
+  function formatTime(value) {
+    const minutes = Math.floor(value / 60).toString().padStart(2, "0");
+    const seconds = (value % 60).toString().padStart(2, "0");
+    return `${minutes}:${seconds}`;
+  }
+
+  function sameCell(a, b) {
+    return a && b && a.row === b.row && a.col === b.col;
+  }
+
+  function isEmpty(row, col) {
+    return row >= 0 && row <= ROWS + 1 && col >= 0 && col <= COLS + 1 && grid[row][col] === 0;
+  }
+
+  function canPass(row, col, target) {
+    return isEmpty(row, col) || (row === target.row && col === target.col);
+  }
+
+  function clearLine(a, b, target) {
+    if (a.row !== b.row && a.col !== b.col) return false;
+
+    const rowStep = Math.sign(b.row - a.row);
+    const colStep = Math.sign(b.col - a.col);
+    let row = a.row + rowStep;
+    let col = a.col + colStep;
+
+    while (row !== b.row || col !== b.col) {
+      if (!canPass(row, col, target)) return false;
+      row += rowStep;
+      col += colStep;
+    }
+    return canPass(b.row, b.col, target);
+  }
+
+  function compactPath(points) {
+    const result = [];
+    for (const point of points) {
+      const prev = result[result.length - 1];
+      if (!prev || prev.row !== point.row || prev.col !== point.col) {
+        result.push(point);
+      }
+    }
+    return result;
+  }
+
+  function findPath(a, b) {
+    if (!a || !b || sameCell(a, b)) return null;
+    if (grid[a.row][a.col] !== grid[b.row][b.col]) return null;
+
+    if (clearLine(a, b, b)) return compactPath([a, b]);
+
+    const turnA = { row: a.row, col: b.col };
+    if (canPass(turnA.row, turnA.col, b) && clearLine(a, turnA, b) && clearLine(turnA, b, b)) {
+      return compactPath([a, turnA, b]);
+    }
+
+    const turnB = { row: b.row, col: a.col };
+    if (canPass(turnB.row, turnB.col, b) && clearLine(a, turnB, b) && clearLine(turnB, b, b)) {
+      return compactPath([a, turnB, b]);
+    }
+
+    for (let row = 0; row <= ROWS + 1; row++) {
+      const first = { row, col: a.col };
+      const second = { row, col: b.col };
+      if (
+        canPass(first.row, first.col, b) &&
+        canPass(second.row, second.col, b) &&
+        clearLine(a, first, b) &&
+        clearLine(first, second, b) &&
+        clearLine(second, b, b)
+      ) {
+        return compactPath([a, first, second, b]);
+      }
+    }
+
+    for (let col = 0; col <= COLS + 1; col++) {
+      const first = { row: a.row, col };
+      const second = { row: b.row, col };
+      if (
+        canPass(first.row, first.col, b) &&
+        canPass(second.row, second.col, b) &&
+        clearLine(a, first, b) &&
+        clearLine(first, second, b) &&
+        clearLine(second, b, b)
+      ) {
+        return compactPath([a, first, second, b]);
+      }
+    }
+
+    return null;
+  }
+
+  function canConnect(a, b) {
+    return Boolean(findPath(a, b));
+  }
+
+  function cellCenter(point) {
+    const boardRect = boardEl.getBoundingClientRect();
+    const wrapRect = boardWrapEl.getBoundingClientRect();
+    const tile = boardEl.querySelector(`[data-row="${point.row}"][data-col="${point.col}"]`);
+    const sampleTile = boardEl.querySelector(".tile");
+
+    if (tile) {
+      const rect = tile.getBoundingClientRect();
+      return {
+        x: rect.left - wrapRect.left + rect.width / 2,
+        y: rect.top - wrapRect.top + rect.height / 2,
+      };
+    }
+
+    const sampleRect = sampleTile.getBoundingClientRect();
+    const tileSize = sampleRect.width;
+    const tileHeight = sampleRect.height;
+    const colGap = parseFloat(getComputedStyle(boardEl).columnGap) || 0;
+    const rowGap = parseFloat(getComputedStyle(boardEl).rowGap) || 0;
+    const stepX = tileSize + colGap;
+    const stepY = tileHeight + rowGap;
+    const boardLeft = boardRect.left - wrapRect.left;
+    const boardTop = boardRect.top - wrapRect.top;
+    let x;
+    let y;
+
+    if (point.col < 1) x = boardLeft - colGap / 2;
+    else if (point.col > COLS) x = boardLeft + boardRect.width + colGap / 2;
+    else x = boardLeft + (point.col - 1) * stepX + tileSize / 2;
+
+    if (point.row < 1) y = boardTop - rowGap / 2;
+    else if (point.row > ROWS) y = boardTop + boardRect.height + rowGap / 2;
+    else y = boardTop + (point.row - 1) * stepY + tileHeight / 2;
+
+    return {
+      x,
+      y,
+    };
+  }
+
+  function drawPath(path) {
+    pathLayerEl.innerHTML = "";
+    const points = path.map(cellCenter);
+    const polyline = document.createElementNS("http://www.w3.org/2000/svg", "polyline");
+    polyline.setAttribute("class", "path-line");
+    polyline.setAttribute("points", points.map(point => `${point.x},${point.y}`).join(" "));
+    pathLayerEl.appendChild(polyline);
+    window.setTimeout(() => {
+      pathLayerEl.innerHTML = "";
+    }, 280);
+  }
+
+  function updateStats() {
+    levelEl.textContent = String(level);
+    timeEl.textContent = formatTime(timeLeft);
+    timeEl.classList.toggle("danger", timeLeft <= 20);
+    matchedEl.textContent = `${matchedCount}/${TOTAL_TILES}`;
+  }
+
+  function render() {
+    boardEl.innerHTML = "";
+    for (let row = 1; row <= ROWS; row++) {
+      for (let col = 1; col <= COLS; col++) {
+        const button = document.createElement("button");
+        button.type = "button";
+        button.className = "tile";
+        button.dataset.row = row;
+        button.dataset.col = col;
+        button.setAttribute("aria-label", grid[row][col] ? `水果 ${grid[row][col]}` : "已消除");
+
+        if (grid[row][col] === 0) {
+          button.classList.add("matched");
+          button.disabled = true;
+        } else {
+          button.textContent = grid[row][col];
+        }
+
+        if (selected && selected.row === row && selected.col === col) {
+          button.classList.add("selected");
+        }
+
+        boardEl.appendChild(button);
+      }
+    }
+    updateStats();
+  }
+
+  function showOverlay(title, text, buttonText, onClick) {
+    overlayTitleEl.textContent = title;
+    overlayTextEl.textContent = text;
+    overlayBtn.textContent = buttonText;
+    overlayBtn.onclick = onClick;
+    overlayEl.classList.remove("hidden");
+  }
+
+  function hideOverlay() {
+    overlayEl.classList.add("hidden");
+  }
+
+  function stopTimer() {
+    if (timerId) {
+      clearInterval(timerId);
+      timerId = null;
+    }
+  }
+
+  function startTimer() {
+    stopTimer();
+    timerId = setInterval(() => {
+      timeLeft -= 1;
+      updateStats();
+      if (timeLeft <= 0) {
+        gameOver();
+      }
+    }, 1000);
+  }
+
+  function startGame(nextLevel = 1) {
+    clearTimeout(nextLevelId);
+    level = nextLevel;
+    timeLeft = levelTime(level);
+    matchedCount = 0;
+    selected = null;
+    locked = false;
+    createBoard();
+    hideOverlay();
+    render();
+    startTimer();
+  }
+
+  function nextLevel() {
+    startGame(level + 1);
+  }
+
+  function gameOver() {
+    stopTimer();
+    locked = true;
+    selected = null;
+    render();
+    showOverlay("时间到", `你坚持到了第 ${level} 关。`, "重新开始", () => startGame(1));
+  }
+
+  function completeLevel() {
+    stopTimer();
+    locked = true;
+    selected = null;
+    render();
+    showOverlay("过关", `第 ${level} 关完成，下一关时间更紧。`, "下一关", nextLevel);
+    nextLevelId = window.setTimeout(nextLevel, 1200);
+  }
+
+  function getTile(row, col) {
+    return boardEl.querySelector(`[data-row="${row}"][data-col="${col}"]`);
+  }
+
+  function failSelection(a, b) {
+    const first = getTile(a.row, a.col);
+    const second = getTile(b.row, b.col);
+    if (first) first.classList.add("shake");
+    if (second) second.classList.add("shake");
+    locked = true;
+    window.setTimeout(() => {
+      selected = null;
+      locked = false;
+      render();
+    }, 270);
+  }
+
+  function handleTileClick(row, col) {
+    if (locked || grid[row][col] === 0) return;
+
+    const current = { row, col };
+    if (!selected) {
+      selected = current;
+      render();
+      return;
+    }
+
+    if (sameCell(selected, current)) {
+      selected = null;
+      render();
+      return;
+    }
+
+    const previous = selected;
+    const path = findPath(previous, current);
+
+    if (!path) {
+      failSelection(previous, current);
+      return;
+    }
+
+    locked = true;
+    drawPath(path);
+    window.setTimeout(() => {
+      grid[previous.row][previous.col] = 0;
+      grid[current.row][current.col] = 0;
+      matchedCount += 2;
+      selected = null;
+      locked = false;
+      render();
+
+      if (matchedCount >= TOTAL_TILES) {
+        completeLevel();
+      }
+    }, 220);
+  }
+
+  boardEl.addEventListener("click", event => {
+    const tile = event.target.closest(".tile");
+    if (!tile || tile.disabled) return;
+    handleTileClick(Number(tile.dataset.row), Number(tile.dataset.col));
+  });
+
+  resetBtn.addEventListener("click", () => startGame(1));
+
+  startGame(1);
+</script>
+</body>
+</html>

@@ -1,0 +1,1151 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>云禾小馆 | 当代中式餐厅</title>
+  <style>
+    :root {
+      --ink: #1d2026;
+      --soft-ink: #394049;
+      --muted: #6f7882;
+      --paper: #fff8ed;
+      --paper-deep: #f2ebdf;
+      --white: #ffffff;
+      --jade: #0c756f;
+      --jade-dark: #084f4a;
+      --coral: #be3f2e;
+      --gold: #d6a348;
+      --leaf: #6f8f46;
+      --line: rgba(29, 32, 38, 0.14);
+      --shadow: 0 24px 70px rgba(29, 32, 38, 0.18);
+    }
+
+    * {
+      box-sizing: border-box;
+    }
+
+    html {
+      scroll-behavior: smooth;
+    }
+
+    body {
+      margin: 0;
+      background: var(--paper);
+      color: var(--ink);
+      font-family: "Microsoft YaHei", "PingFang SC", "Segoe UI", system-ui, sans-serif;
+      line-height: 1.6;
+    }
+
+    img {
+      display: block;
+      width: 100%;
+      height: 100%;
+      object-fit: cover;
+    }
+
+    a {
+      color: inherit;
+      text-decoration: none;
+    }
+
+    button,
+    input,
+    select,
+    textarea {
+      font: inherit;
+    }
+
+    .topbar {
+      position: fixed;
+      top: 0;
+      left: 0;
+      z-index: 20;
+      width: 100%;
+      background: rgba(255, 248, 237, 0.9);
+      border-bottom: 1px solid rgba(255, 255, 255, 0.64);
+      backdrop-filter: blur(18px);
+    }
+
+    .nav {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      width: min(1180px, calc(100% - 32px));
+      min-height: 72px;
+      margin: 0 auto;
+      gap: 22px;
+    }
+
+    .brand {
+      display: grid;
+      gap: 0;
+      line-height: 1.2;
+    }
+
+    .brand strong {
+      font-size: 22px;
+      letter-spacing: 0;
+    }
+
+    .brand span {
+      color: var(--muted);
+      font-size: 12px;
+    }
+
+    .nav-links {
+      display: flex;
+      align-items: center;
+      gap: 24px;
+      color: var(--soft-ink);
+      font-size: 15px;
+    }
+
+    .nav-links a {
+      position: relative;
+      padding: 24px 0;
+    }
+
+    .nav-links a::after {
+      content: "";
+      position: absolute;
+      left: 0;
+      bottom: 18px;
+      width: 100%;
+      height: 2px;
+      background: var(--coral);
+      transform: scaleX(0);
+      transform-origin: right;
+      transition: transform 180ms ease;
+    }
+
+    .nav-links a:hover::after {
+      transform: scaleX(1);
+      transform-origin: left;
+    }
+
+    .btn {
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      min-height: 46px;
+      padding: 0 20px;
+      border: 1px solid transparent;
+      border-radius: 7px;
+      background: var(--jade);
+      color: var(--white);
+      font-weight: 800;
+      white-space: nowrap;
+      cursor: pointer;
+      transition: transform 160ms ease, box-shadow 160ms ease, background 160ms ease;
+    }
+
+    .btn:hover {
+      transform: translateY(-2px);
+      box-shadow: 0 14px 26px rgba(12, 117, 111, 0.22);
+      background: var(--jade-dark);
+    }
+
+    .btn.secondary {
+      background: rgba(255, 255, 255, 0.1);
+      border-color: rgba(255, 255, 255, 0.46);
+      color: var(--white);
+    }
+
+    .btn.light {
+      background: var(--white);
+      color: var(--jade-dark);
+      border-color: var(--line);
+    }
+
+    .hero {
+      position: relative;
+      min-height: 94vh;
+      padding: 126px 0 64px;
+      isolation: isolate;
+      overflow: hidden;
+    }
+
+    .hero::before {
+      content: "";
+      position: absolute;
+      inset: 0;
+      z-index: -2;
+      background:
+        linear-gradient(90deg, rgba(14, 18, 20, 0.84) 0%, rgba(14, 18, 20, 0.6) 44%, rgba(14, 18, 20, 0.18) 100%),
+        url("https://images.unsplash.com/photo-1559847844-5315695dadae?auto=format&fit=crop&w=1900&q=84") center / cover;
+    }
+
+    .hero::after {
+      content: "";
+      position: absolute;
+      inset: auto 0 0;
+      z-index: -1;
+      height: 190px;
+      background: linear-gradient(180deg, transparent, var(--paper));
+    }
+
+    .hero-inner,
+    .section-inner {
+      width: min(1180px, calc(100% - 32px));
+      margin: 0 auto;
+    }
+
+    .hero-content {
+      max-width: 680px;
+      color: var(--white);
+    }
+
+    .eyebrow {
+      display: inline-flex;
+      align-items: center;
+      gap: 10px;
+      margin-bottom: 18px;
+      color: #ffe1a3;
+      font-size: 14px;
+      font-weight: 800;
+    }
+
+    .eyebrow::before {
+      content: "";
+      width: 34px;
+      height: 2px;
+      background: currentColor;
+    }
+
+    h1,
+    h2,
+    h3,
+    p {
+      margin-top: 0;
+    }
+
+    h1 {
+      margin-bottom: 20px;
+      font-size: clamp(52px, 8vw, 104px);
+      line-height: 0.96;
+      letter-spacing: 0;
+    }
+
+    .hero p {
+      max-width: 590px;
+      margin-bottom: 30px;
+      color: rgba(255, 255, 255, 0.9);
+      font-size: 20px;
+    }
+
+    .hero-actions {
+      display: flex;
+      flex-wrap: wrap;
+      align-items: center;
+      gap: 14px;
+    }
+
+    .hero-meta {
+      display: grid;
+      grid-template-columns: repeat(4, 1fr);
+      gap: 1px;
+      max-width: 920px;
+      margin-top: 62px;
+      background: rgba(255, 255, 255, 0.24);
+      border: 1px solid rgba(255, 255, 255, 0.28);
+      box-shadow: var(--shadow);
+    }
+
+    .meta-item {
+      padding: 18px;
+      background: rgba(255, 248, 237, 0.94);
+      color: var(--ink);
+    }
+
+    .meta-item strong {
+      display: block;
+      font-size: 18px;
+      line-height: 1.2;
+    }
+
+    .meta-item span {
+      color: var(--muted);
+      font-size: 14px;
+    }
+
+    section {
+      padding: 88px 0;
+    }
+
+    .section-head {
+      display: flex;
+      align-items: end;
+      justify-content: space-between;
+      gap: 32px;
+      margin-bottom: 36px;
+    }
+
+    .section-head h2 {
+      margin-bottom: 0;
+      font-size: clamp(32px, 4vw, 50px);
+      line-height: 1.08;
+    }
+
+    .section-head p {
+      max-width: 460px;
+      margin-bottom: 0;
+      color: var(--muted);
+      font-size: 17px;
+    }
+
+    .story {
+      display: grid;
+      grid-template-columns: 0.92fr 1.08fr;
+      gap: 48px;
+      align-items: center;
+    }
+
+    .story-image {
+      position: relative;
+      overflow: hidden;
+      min-height: 560px;
+      border-radius: 8px;
+      box-shadow: var(--shadow);
+    }
+
+    .story-badge {
+      position: absolute;
+      left: 22px;
+      bottom: 22px;
+      max-width: 250px;
+      padding: 16px;
+      border-radius: 8px;
+      background: rgba(255, 248, 237, 0.94);
+      color: var(--ink);
+      box-shadow: 0 14px 34px rgba(29, 32, 38, 0.16);
+    }
+
+    .story-badge strong {
+      display: block;
+      color: var(--coral);
+      font-size: 26px;
+      line-height: 1;
+    }
+
+    .story-copy h2 {
+      margin-bottom: 18px;
+      font-size: clamp(34px, 5vw, 58px);
+      line-height: 1.06;
+    }
+
+    .story-copy p {
+      color: var(--muted);
+      font-size: 17px;
+    }
+
+    .stats {
+      display: grid;
+      grid-template-columns: repeat(3, 1fr);
+      gap: 16px;
+      margin-top: 30px;
+    }
+
+    .stat {
+      border-top: 2px solid var(--line);
+      padding-top: 16px;
+    }
+
+    .stat strong {
+      display: block;
+      color: var(--coral);
+      font-size: 32px;
+      line-height: 1;
+    }
+
+    .menu-band {
+      background: var(--paper-deep);
+      border-block: 1px solid var(--line);
+    }
+
+    .menu-grid {
+      display: grid;
+      grid-template-columns: repeat(3, 1fr);
+      gap: 22px;
+    }
+
+    .dish {
+      overflow: hidden;
+      border: 1px solid var(--line);
+      border-radius: 8px;
+      background: var(--white);
+      box-shadow: 0 10px 28px rgba(29, 32, 38, 0.07);
+      transition: transform 180ms ease, box-shadow 180ms ease;
+    }
+
+    .dish:hover {
+      transform: translateY(-5px);
+      box-shadow: 0 20px 42px rgba(29, 32, 38, 0.12);
+    }
+
+    .dish-photo {
+      height: 232px;
+      background: #ddd;
+    }
+
+    .dish-body {
+      padding: 20px;
+    }
+
+    .dish-title {
+      display: flex;
+      justify-content: space-between;
+      gap: 16px;
+      margin-bottom: 8px;
+    }
+
+    .dish h3 {
+      margin-bottom: 0;
+      font-size: 20px;
+      line-height: 1.25;
+    }
+
+    .tag {
+      display: inline-flex;
+      margin-bottom: 12px;
+      padding: 3px 9px;
+      border-radius: 999px;
+      background: rgba(12, 117, 111, 0.1);
+      color: var(--jade-dark);
+      font-size: 12px;
+      font-weight: 800;
+    }
+
+    .price {
+      color: var(--coral);
+      font-weight: 900;
+    }
+
+    .dish p {
+      margin-bottom: 0;
+      color: var(--muted);
+      font-size: 15px;
+    }
+
+    .tasting {
+      display: grid;
+      grid-template-columns: 0.95fr 1.05fr;
+      gap: 34px;
+      align-items: stretch;
+    }
+
+    .tasting-photo {
+      min-height: 520px;
+      overflow: hidden;
+      border-radius: 8px;
+      box-shadow: var(--shadow);
+    }
+
+    .course-list {
+      display: grid;
+      gap: 12px;
+      align-content: center;
+    }
+
+    .course {
+      display: grid;
+      grid-template-columns: 62px 1fr;
+      gap: 18px;
+      padding: 18px 0;
+      border-bottom: 1px solid var(--line);
+    }
+
+    .course b {
+      color: var(--coral);
+      font-size: 18px;
+    }
+
+    .course h3 {
+      margin-bottom: 4px;
+      font-size: 20px;
+    }
+
+    .course p {
+      margin-bottom: 0;
+      color: var(--muted);
+    }
+
+    .chef-band {
+      position: relative;
+      overflow: hidden;
+      background: #1f2f2d;
+      color: var(--white);
+    }
+
+    .chef {
+      display: grid;
+      grid-template-columns: 0.85fr 1.15fr;
+      gap: 46px;
+      align-items: center;
+    }
+
+    .chef-photo {
+      min-height: 520px;
+      overflow: hidden;
+      border-radius: 8px;
+      box-shadow: 0 24px 70px rgba(0, 0, 0, 0.28);
+    }
+
+    .chef p {
+      color: rgba(255, 255, 255, 0.76);
+      font-size: 17px;
+    }
+
+    .quote {
+      margin: 28px 0;
+      padding-left: 20px;
+      border-left: 3px solid var(--gold);
+      color: #ffe4aa;
+      font-size: 24px;
+      line-height: 1.35;
+      font-weight: 800;
+    }
+
+    .awards {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 10px;
+    }
+
+    .awards span {
+      padding: 8px 12px;
+      border: 1px solid rgba(255, 255, 255, 0.22);
+      border-radius: 999px;
+      color: rgba(255, 255, 255, 0.82);
+      font-size: 13px;
+      font-weight: 800;
+    }
+
+    .gallery {
+      display: grid;
+      grid-template-columns: 1.2fr 0.8fr 0.8fr;
+      grid-auto-rows: 230px;
+      gap: 16px;
+    }
+
+    .gallery figure {
+      position: relative;
+      overflow: hidden;
+      margin: 0;
+      border-radius: 8px;
+      background: #ddd;
+    }
+
+    .gallery figure:first-child {
+      grid-row: span 2;
+    }
+
+    .gallery figcaption {
+      position: absolute;
+      left: 14px;
+      bottom: 14px;
+      padding: 8px 10px;
+      border-radius: 6px;
+      background: rgba(255, 248, 237, 0.92);
+      color: var(--ink);
+      font-size: 14px;
+      font-weight: 800;
+    }
+
+    .reviews-grid {
+      display: grid;
+      grid-template-columns: repeat(3, 1fr);
+      gap: 20px;
+    }
+
+    .review {
+      padding: 24px;
+      border: 1px solid var(--line);
+      border-radius: 8px;
+      background: var(--white);
+      box-shadow: 0 10px 30px rgba(29, 32, 38, 0.06);
+    }
+
+    .stars {
+      color: var(--gold);
+      font-size: 18px;
+      letter-spacing: 0;
+    }
+
+    .review p {
+      color: var(--soft-ink);
+      font-size: 16px;
+    }
+
+    .review strong {
+      color: var(--coral);
+    }
+
+    .private-dining {
+      position: relative;
+      min-height: 480px;
+      display: grid;
+      align-items: end;
+      padding: 0;
+      overflow: hidden;
+      color: var(--white);
+      isolation: isolate;
+    }
+
+    .private-dining::before {
+      content: "";
+      position: absolute;
+      inset: 0;
+      z-index: -2;
+      background:
+        linear-gradient(180deg, rgba(13, 18, 19, 0.12), rgba(13, 18, 19, 0.82)),
+        url("https://images.unsplash.com/photo-1414235077428-338989a2e8c0?auto=format&fit=crop&w=1800&q=82") center / cover;
+    }
+
+    .private-copy {
+      width: min(1180px, calc(100% - 32px));
+      margin: 0 auto;
+      padding: 0 0 62px;
+      max-width: 1180px;
+    }
+
+    .private-copy h2 {
+      max-width: 700px;
+      margin-bottom: 16px;
+      font-size: clamp(34px, 5vw, 62px);
+      line-height: 1.05;
+    }
+
+    .private-copy p {
+      max-width: 580px;
+      color: rgba(255, 255, 255, 0.84);
+      font-size: 18px;
+    }
+
+    .visit {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 34px;
+      align-items: stretch;
+    }
+
+    .visit-panel {
+      padding: 34px;
+      border: 1px solid var(--line);
+      border-radius: 8px;
+      background: var(--white);
+    }
+
+    .visit-panel h2 {
+      margin-bottom: 18px;
+      font-size: 36px;
+      line-height: 1.1;
+    }
+
+    .info-list {
+      display: grid;
+      gap: 18px;
+      margin: 26px 0;
+    }
+
+    .info-row {
+      display: flex;
+      justify-content: space-between;
+      gap: 22px;
+      padding-bottom: 14px;
+      border-bottom: 1px solid var(--line);
+    }
+
+    .info-row span {
+      color: var(--muted);
+      text-align: right;
+    }
+
+    .reservation {
+      display: grid;
+      gap: 14px;
+    }
+
+    .reservation input,
+    .reservation select,
+    .reservation textarea {
+      width: 100%;
+      min-height: 48px;
+      border: 1px solid var(--line);
+      border-radius: 7px;
+      padding: 12px 14px;
+      background: #fffdf8;
+      color: var(--ink);
+      outline: none;
+      transition: border-color 160ms ease, box-shadow 160ms ease;
+    }
+
+    .reservation input:focus,
+    .reservation select:focus,
+    .reservation textarea:focus {
+      border-color: rgba(12, 117, 111, 0.55);
+      box-shadow: 0 0 0 4px rgba(12, 117, 111, 0.1);
+    }
+
+    .reservation textarea {
+      min-height: 112px;
+      resize: vertical;
+    }
+
+    .form-grid {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 14px;
+    }
+
+    .form-note {
+      min-height: 24px;
+      margin: 0;
+      color: var(--jade-dark);
+      font-size: 14px;
+      font-weight: 800;
+    }
+
+    footer {
+      padding: 38px 0;
+      background: #1d2026;
+      color: rgba(255, 255, 255, 0.72);
+    }
+
+    .footer-inner {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      gap: 20px;
+      width: min(1180px, calc(100% - 32px));
+      margin: 0 auto;
+    }
+
+    .footer-inner strong {
+      color: var(--white);
+    }
+
+    @media (max-width: 920px) {
+      .nav {
+        min-height: 64px;
+      }
+
+      .nav-links {
+        display: none;
+      }
+
+      .hero {
+        min-height: auto;
+        padding-top: 116px;
+      }
+
+      .hero-meta,
+      .story,
+      .menu-grid,
+      .tasting,
+      .chef,
+      .gallery,
+      .reviews-grid,
+      .visit {
+        grid-template-columns: 1fr;
+      }
+
+      .hero-meta {
+        max-width: 100%;
+      }
+
+      .section-head {
+        display: grid;
+      }
+
+      .story-image,
+      .tasting-photo,
+      .chef-photo {
+        min-height: 380px;
+      }
+
+      .stats,
+      .form-grid {
+        grid-template-columns: 1fr;
+      }
+
+      .gallery {
+        grid-auto-rows: 260px;
+      }
+
+      .gallery figure:first-child {
+        grid-row: span 1;
+      }
+
+      .footer-inner {
+        display: grid;
+      }
+    }
+
+    @media (max-width: 560px) {
+      .brand strong {
+        font-size: 19px;
+      }
+
+      .nav .btn {
+        min-height: 40px;
+        padding: 0 12px;
+        font-size: 14px;
+      }
+
+      .hero-actions {
+        align-items: stretch;
+        flex-direction: column;
+      }
+
+      .btn {
+        width: 100%;
+      }
+
+      .hero-meta {
+        grid-template-columns: 1fr;
+      }
+
+      section {
+        padding: 64px 0;
+      }
+
+      .visit-panel {
+        padding: 24px;
+      }
+
+      .info-row {
+        display: grid;
+        gap: 4px;
+      }
+
+      .info-row span {
+        text-align: left;
+      }
+    }
+  </style>
+</head>
+<body>
+  <header class="topbar">
+    <nav class="nav" aria-label="主导航">
+      <a class="brand" href="#top" aria-label="云禾小馆首页">
+        <strong>云禾小馆</strong>
+        <span>当代中式餐厅</span>
+      </a>
+      <div class="nav-links">
+        <a href="#story">关于</a>
+        <a href="#menu">菜单</a>
+        <a href="#chef">主厨</a>
+        <a href="#space">空间</a>
+        <a href="#reserve">预订</a>
+      </div>
+      <a class="btn" href="#reserve">订座</a>
+    </nav>
+  </header>
+
+  <main id="top">
+    <section class="hero" aria-label="云禾小馆介绍">
+      <div class="hero-inner">
+        <div class="hero-content">
+          <span class="eyebrow">新鲜炉火与本地时蔬</span>
+          <h1>云禾小馆</h1>
+          <p>把江南家常的温润、炭火料理的香气和当季食材放在一张桌上。适合约会、小聚，也适合认真吃一顿好饭。</p>
+          <div class="hero-actions">
+            <a class="btn" href="#reserve">预订今晚</a>
+            <a class="btn secondary" href="#menu">查看招牌菜</a>
+          </div>
+        </div>
+        <div class="hero-meta" aria-label="餐厅概览">
+          <div class="meta-item">
+            <strong>17:30 - 22:30</strong>
+            <span>每日晚餐营业</span>
+          </div>
+          <div class="meta-item">
+            <strong>人均 ¥168</strong>
+            <span>单点与季节套餐</span>
+          </div>
+          <div class="meta-item">
+            <strong>上海静安</strong>
+            <span>南京西路 618 号</span>
+          </div>
+          <div class="meta-item">
+            <strong>36 席</strong>
+            <span>含 1 间私宴包间</span>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <section id="story">
+      <div class="section-inner story">
+        <div class="story-image">
+          <img src="https://images.unsplash.com/photo-1517248135467-4c7edcad34c4?auto=format&fit=crop&w=1200&q=82" alt="温暖灯光下的餐厅用餐空间">
+          <div class="story-badge">
+            <strong>4.8</strong>
+            <span>来自 1200+ 食客评分</span>
+          </div>
+        </div>
+        <div class="story-copy">
+          <span class="eyebrow" style="color: var(--coral);">我们的餐桌</span>
+          <h2>熟悉的味道，换一种更从容的表达。</h2>
+          <p>厨房每天从市场挑选小份量食材，菜单随季节微调。酱汁、汤底和腌料都在店内完成，保留中式料理的层次，也让出食材本来的清甜。</p>
+          <p>空间不追求喧闹，木、石、暖光和开放式厨房一起构成一顿饭的节奏。你能看见炉火、听见锅气，也能舒服地聊天。</p>
+          <div class="stats">
+            <div class="stat">
+              <strong>24</strong>
+              <span>道当季菜品</span>
+            </div>
+            <div class="stat">
+              <strong>8</strong>
+              <span>道晚市套餐</span>
+            </div>
+            <div class="stat">
+              <strong>12</strong>
+              <span>款小产区酒饮</span>
+            </div>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <section id="menu" class="menu-band">
+      <div class="section-inner">
+        <div class="section-head">
+          <h2>今日推荐</h2>
+          <p>招牌菜以炭火、慢煨和清蒸为主，口味干净但有记忆点。晚市会根据市场食材临时加菜。</p>
+        </div>
+        <div class="menu-grid">
+          <article class="dish">
+            <div class="dish-photo">
+              <img src="https://images.unsplash.com/photo-1563245372-f21724e3856d?auto=format&fit=crop&w=900&q=82" alt="摆盘精致的烤鱼料理">
+            </div>
+            <div class="dish-body">
+              <span class="tag">炭火招牌</span>
+              <div class="dish-title">
+                <h3>炭火桂花鱼</h3>
+                <span class="price">¥138</span>
+              </div>
+              <p>鲜鱼轻腌后炭烤，配青柠、紫苏和微甜酱汁。</p>
+            </div>
+          </article>
+          <article class="dish">
+            <div class="dish-photo">
+              <img src="https://images.unsplash.com/photo-1563379926898-05f4575a45d8?auto=format&fit=crop&w=900&q=82" alt="热气腾腾的红烧肉和米饭">
+            </div>
+            <div class="dish-body">
+              <span class="tag">慢煨热菜</span>
+              <div class="dish-title">
+                <h3>黑糖红烧肉</h3>
+                <span class="price">¥96</span>
+              </div>
+              <p>三小时慢煨，肥而不腻，搭配梅干菜和小米饭。</p>
+            </div>
+          </article>
+          <article class="dish">
+            <div class="dish-photo">
+              <img src="https://images.unsplash.com/photo-1546069901-ba9599a7e63c?auto=format&fit=crop&w=900&q=82" alt="色彩丰富的时令蔬菜沙拉">
+            </div>
+            <div class="dish-body">
+              <span class="tag">时令素食</span>
+              <div class="dish-title">
+                <h3>春山时蔬盘</h3>
+                <span class="price">¥68</span>
+              </div>
+              <p>清炒、冷拌和脆炸三种口感，配自制芝麻酱。</p>
+            </div>
+          </article>
+        </div>
+      </div>
+    </section>
+
+    <section>
+      <div class="section-inner tasting">
+        <div>
+          <div class="section-head" style="display: block; margin-bottom: 24px;">
+            <span class="eyebrow" style="color: var(--leaf);">季节套餐</span>
+            <h2>一席六味，从开胃到收尾刚刚好。</h2>
+            <p>适合第一次来店的客人。每位 ¥268，可搭配三杯酒饮或无酒精茶饮。</p>
+          </div>
+          <div class="course-list">
+            <div class="course">
+              <b>01</b>
+              <div>
+                <h3>桂花米酒冻</h3>
+                <p>轻甜开胃，配柚子皮和脆米。</p>
+              </div>
+            </div>
+            <div class="course">
+              <b>02</b>
+              <div>
+                <h3>清蒸东海小黄鱼</h3>
+                <p>以葱油和鱼骨清汤提鲜。</p>
+              </div>
+            </div>
+            <div class="course">
+              <b>03</b>
+              <div>
+                <h3>砂锅鸡汤小馄饨</h3>
+                <p>慢熬汤底，暖胃但不厚重。</p>
+              </div>
+            </div>
+            <div class="course">
+              <b>04</b>
+              <div>
+                <h3>乌龙茶奶冻</h3>
+                <p>低糖收尾，带一点焙火香。</p>
+              </div>
+            </div>
+          </div>
+        </div>
+        <div class="tasting-photo">
+          <img src="https://images.unsplash.com/photo-1504674900247-0877df9cc836?auto=format&fit=crop&w=1200&q=82" alt="餐桌上的精致套餐菜品">
+        </div>
+      </div>
+    </section>
+
+    <section id="chef" class="chef-band">
+      <div class="section-inner chef">
+        <div class="chef-photo">
+          <img src="https://images.unsplash.com/photo-1577219491135-ce391730fb2c?auto=format&fit=crop&w=1000&q=82" alt="餐厅主厨在厨房工作">
+        </div>
+        <div>
+          <span class="eyebrow">主厨与厨房</span>
+          <h2>让烟火气更细致一点。</h2>
+          <p>主厨林知远曾在杭州、上海多家中餐厅工作，擅长用现代节奏处理传统家常味。云禾小馆的菜单不追求复杂名词，重点是火候、汤底和当天食材。</p>
+          <div class="quote">“好吃不是堆满调味，而是每一口都知道自己为什么在这里。”</div>
+          <div class="awards" aria-label="餐厅特色">
+            <span>本地时蔬</span>
+            <span>自制酱料</span>
+            <span>开放式厨房</span>
+            <span>小产区酒饮</span>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <section id="space">
+      <div class="section-inner">
+        <div class="section-head">
+          <h2>空间与氛围</h2>
+          <p>适合两人晚餐、朋友聚会和小型商务餐。包间可提前预约，低噪声灯光让整晚都放松。</p>
+        </div>
+        <div class="gallery" aria-label="餐厅空间照片">
+          <figure>
+            <img src="https://images.unsplash.com/photo-1555396273-367ea4eb4db5?auto=format&fit=crop&w=1200&q=82" alt="餐厅吧台和餐桌">
+            <figcaption>开放式厨房</figcaption>
+          </figure>
+          <figure>
+            <img src="https://images.unsplash.com/photo-1559339352-11d035aa65de?auto=format&fit=crop&w=800&q=82" alt="餐厅靠窗座位">
+            <figcaption>靠窗双人位</figcaption>
+          </figure>
+          <figure>
+            <img src="https://images.unsplash.com/photo-1552566626-52f8b828add9?auto=format&fit=crop&w=800&q=82" alt="餐厅长桌聚餐区">
+            <figcaption>聚会长桌</figcaption>
+          </figure>
+        </div>
+      </div>
+    </section>
+
+    <section>
+      <div class="section-inner">
+        <div class="section-head">
+          <h2>食客评价</h2>
+          <p>不是夸张的网红店，更像是一家会想反复回来的晚餐据点。</p>
+        </div>
+        <div class="reviews-grid">
+          <article class="review">
+            <div class="stars">★★★★★</div>
+            <p>“菜品很稳，红烧肉和小馄饨尤其惊喜。服务节奏舒服，不会一直打扰。”</p>
+            <strong>陈女士 · 周五晚餐</strong>
+          </article>
+          <article class="review">
+            <div class="stars">★★★★★</div>
+            <p>“空间比照片更温暖，适合约会。套餐份量刚好，茶饮搭配很认真。”</p>
+            <strong>Leo · 双人套餐</strong>
+          </article>
+          <article class="review">
+            <div class="stars">★★★★★</div>
+            <p>“包间安静，商务餐不尴尬。主厨会根据忌口调整菜单，这点很加分。”</p>
+            <strong>王先生 · 私宴包间</strong>
+          </article>
+        </div>
+      </div>
+    </section>
+
+    <section class="private-dining" aria-label="私宴服务">
+      <div class="private-copy">
+        <span class="eyebrow">私宴与小型聚会</span>
+        <h2>把重要的一餐，安排得更体面。</h2>
+        <p>6 至 12 人可预约独立包间。我们会根据人数、预算、忌口和酒饮偏好定制菜单。</p>
+        <a class="btn light" href="#reserve">咨询包间</a>
+      </div>
+    </section>
+
+    <section id="reserve" class="menu-band">
+      <div class="section-inner visit">
+        <div class="visit-panel">
+          <h2>到店信息</h2>
+          <p>建议提前一天预订。当天少量散客位会在 17:30 后开放。</p>
+          <div class="info-list">
+            <div class="info-row">
+              <strong>地址</strong>
+              <span>上海市静安区南京西路 618 号 2F</span>
+            </div>
+            <div class="info-row">
+              <strong>电话</strong>
+              <span>021-6188-2026</span>
+            </div>
+            <div class="info-row">
+              <strong>营业</strong>
+              <span>周一至周日 17:30 - 22:30</span>
+            </div>
+            <div class="info-row">
+              <strong>交通</strong>
+              <span>地铁 2/12/13 号线南京西路站 6 号口</span>
+            </div>
+          </div>
+          <a class="btn" href="tel:02161882026">电话预订</a>
+        </div>
+
+        <form class="visit-panel reservation" aria-label="在线预订表单">
+          <h2>在线预订</h2>
+          <div class="form-grid">
+            <input type="text" name="name" placeholder="姓名" aria-label="姓名" required>
+            <input type="tel" name="phone" placeholder="手机号" aria-label="手机号" required>
+          </div>
+          <div class="form-grid">
+            <input type="date" name="date" aria-label="日期" required>
+            <select name="people" aria-label="人数">
+              <option>2 位</option>
+              <option>3-4 位</option>
+              <option>5-6 位</option>
+              <option>包间咨询</option>
+            </select>
+          </div>
+          <textarea name="note" placeholder="备注：过敏、儿童座椅或特殊纪念日" aria-label="备注"></textarea>
+          <button class="btn" type="submit">提交预订</button>
+          <p class="form-note" aria-live="polite"></p>
+        </form>
+      </div>
+    </section>
+  </main>
+
+  <footer>
+    <div class="footer-inner">
+      <strong>云禾小馆</strong>
+      <span>© 2026 Yunhe Bistro. Fresh food, warm table.</span>
+    </div>
+  </footer>
+
+  <script>
+    const form = document.querySelector(".reservation");
+    const formNote = document.querySelector(".form-note");
+
+    form.addEventListener("submit", (event) => {
+      event.preventDefault();
+      formNote.textContent = "已收到预订信息，我们会尽快电话确认。";
+      form.reset();
+    });
+  </script>
+</body>
+</html>
